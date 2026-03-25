@@ -133,7 +133,7 @@ main {
     border-radius: 4px;
     padding: 32px 40px;
     width: 100%;
-    max-width: 440px;
+    max-width: 540px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     align-self: flex-start;
 }
@@ -148,12 +148,42 @@ main {
     text-align: center;
 }
 
+.league-group {
+    margin-bottom: 20px;
+}
+
+.league-group:last-child {
+    margin-bottom: 0;
+}
+
+.league-header {
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+    background: var(--primary);
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.division-header {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    padding: 6px 12px 2px;
+    margin-top: 4px;
+}
+
 .teams-panel ul {
     list-style: none;
 }
 
 .teams-panel li {
-    padding: 10px 12px;
+    padding: 8px 12px 8px 20px;
     border-bottom: 1px solid var(--border);
     font-size: 0.95rem;
 }

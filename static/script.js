@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        teamsList.innerHTML = "<li>Loading...</li>";
+        teamsList.innerHTML = "<p>Loading...</p>";
         teamsPanel.hidden = false;
 
         try {
@@ -34,13 +34,52 @@ document.addEventListener("DOMContentLoaded", async () => {
             const teams = await response.json();
 
             teamsList.innerHTML = "";
-            teams.forEach(name => {
-                const li = document.createElement("li");
-                li.textContent = name;
-                teamsList.appendChild(li);
+
+            // Group teams by league, then by division
+            const leagues = {};
+            teams.forEach(team => {
+                const lg = team.lgID || "Other";
+                if (!leagues[lg]) leagues[lg] = {};
+                const div = team.divID || "";
+                if (!leagues[lg][div]) leagues[lg][div] = [];
+                leagues[lg][div].push(team.name);
             });
+
+            const divNames = { E: "East", C: "Central", W: "West" };
+
+            for (const [lg, divisions] of Object.entries(leagues).sort((a, b) => a[0].localeCompare(b[0]))) {
+                const lgSection = document.createElement("div");
+                lgSection.className = "league-group";
+
+                const lgHeader = document.createElement("h3");
+                lgHeader.className = "league-header";
+                lgHeader.textContent = lg;
+                lgSection.appendChild(lgHeader);
+
+                const divKeys = Object.keys(divisions).sort();
+                const hasDivisions = divKeys.some(d => d !== "");
+
+                for (const div of divKeys) {
+                    if (hasDivisions && div) {
+                        const divHeader = document.createElement("h4");
+                        divHeader.className = "division-header";
+                        divHeader.textContent = divNames[div] || div;
+                        lgSection.appendChild(divHeader);
+                    }
+
+                    const ul = document.createElement("ul");
+                    divisions[div].sort().forEach(name => {
+                        const li = document.createElement("li");
+                        li.textContent = name;
+                        ul.appendChild(li);
+                    });
+                    lgSection.appendChild(ul);
+                }
+
+                teamsList.appendChild(lgSection);
+            }
         } catch {
-            teamsList.innerHTML = "<li>Failed to load teams</li>";
+            teamsList.innerHTML = "<p>Failed to load teams</p>";
         }
     });
 });
