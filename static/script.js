@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const select = document.getElementById("year-select");
     const teamsPanel = document.getElementById("teams-panel");
     const teamsList = document.getElementById("teams-list");
+    const rosterPanel = document.getElementById("roster-panel");
+    const rosterTitle = document.getElementById("roster-title");
+    const rosterList = document.getElementById("roster-list");
 
     try {
         const response = await fetch("/years");
@@ -19,12 +22,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         select.innerHTML = '<option value="">Failed to load years</option>';
     }
 
+    async function loadRoster(teamID, teamName, year) {
+        rosterPanel.hidden = false;
+        rosterTitle.textContent = `${teamName} ${year} Roster`;
+        rosterList.innerHTML = "<li>Loading...</li>";
+
+        try {
+            const response = await fetch(`/players?teamID=${teamID}&yearID=${year}`);
+            const players = await response.json();
+            rosterList.innerHTML = "";
+            players.forEach(p => {
+                const li = document.createElement("li");
+                li.textContent = `${p.nameFirst} ${p.nameLast}`;
+                rosterList.appendChild(li);
+            });
+        } catch {
+            rosterList.innerHTML = "<li>Failed to load roster</li>";
+        }
+    }
+
     select.addEventListener("change", async () => {
         const year = select.value;
         if (!year) {
             teamsPanel.hidden = true;
+            rosterPanel.hidden = true;
             return;
         }
+
+        rosterPanel.hidden = true;
 
         teamsList.innerHTML = "<p>Loading...</p>";
         teamsPanel.hidden = false;
@@ -42,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (!leagues[lg]) leagues[lg] = {};
                 const div = team.divID || "";
                 if (!leagues[lg][div]) leagues[lg][div] = [];
-                leagues[lg][div].push(team.name);
+                leagues[lg][div].push({ name: team.name, teamID: team.teamID });
             });
 
             const divNames = { E: "East", C: "Central", W: "West" };
@@ -68,9 +93,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
                     const ul = document.createElement("ul");
-                    divisions[div].sort().forEach(name => {
+                    divisions[div].sort((a, b) => a.name.localeCompare(b.name)).forEach(team => {
                         const li = document.createElement("li");
-                        li.textContent = name;
+                        li.textContent = team.name;
+                        li.classList.add("team-item");
+                        li.addEventListener("click", () => loadRoster(team.teamID, team.name, year));
                         ul.appendChild(li);
                     });
                     lgSection.appendChild(ul);

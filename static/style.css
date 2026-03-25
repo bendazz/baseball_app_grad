@@ -192,6 +192,53 @@ main {
     border-bottom: none;
 }
 
+.team-item {
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.team-item:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Roster Panel */
+.roster-panel {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--accent);
+    border-radius: 4px;
+    padding: 32px 40px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    align-self: flex-start;
+}
+
+.roster-panel h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.roster-panel ul {
+    list-style: none;
+}
+
+.roster-panel li {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+}
+
+.roster-panel li:last-child {
+    border-bottom: none;
+}
+
 /* Footer */
 footer {
     background: var(--primary);
