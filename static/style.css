@@ -59,6 +59,7 @@ main {
     justify-content: center;
     padding: 40px 16px;
     gap: 24px;
+    flex-wrap: wrap;
     align-items: flex-start;
 }
 
@@ -237,6 +238,89 @@ main {
 
 .roster-panel li:last-child {
     border-bottom: none;
+}
+
+/* Clickable player names */
+.player-item {
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.player-item:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* Player Panel */
+.player-panel {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--accent);
+    border-radius: 4px;
+    padding: 32px 40px;
+    width: 100%;
+    max-width: 720px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    align-self: flex-start;
+}
+
+.player-panel h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.player-bio {
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.player-bio p {
+    margin-bottom: 4px;
+}
+
+.batting-header {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+#batting-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+#batting-table th {
+    background: var(--primary);
+    color: #fff;
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#batting-table td {
+    padding: 5px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+#batting-table tbody tr:hover {
+    background: #eef3f8;
 }
 
 /* Footer */

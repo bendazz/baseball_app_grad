@@ -5,6 +5,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const rosterPanel = document.getElementById("roster-panel");
     const rosterTitle = document.getElementById("roster-title");
     const rosterList = document.getElementById("roster-list");
+    const playerPanel = document.getElementById("player-panel");
+    const playerName = document.getElementById("player-name");
+    const playerBio = document.getElementById("player-bio");
+    const battingTable = document.getElementById("batting-table");
 
     try {
         const response = await fetch("/years");
@@ -23,6 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function loadRoster(teamID, teamName, year) {
+        playerPanel.hidden = true;
         rosterPanel.hidden = false;
         rosterTitle.textContent = `${teamName} ${year} Roster`;
         rosterList.innerHTML = "<li>Loading...</li>";
@@ -34,10 +39,55 @@ document.addEventListener("DOMContentLoaded", async () => {
             players.forEach(p => {
                 const li = document.createElement("li");
                 li.textContent = `${p.nameFirst} ${p.nameLast}`;
+                li.classList.add("player-item");
+                li.addEventListener("click", () => loadPlayer(p.playerID, p.nameFirst, p.nameLast));
                 rosterList.appendChild(li);
             });
         } catch {
             rosterList.innerHTML = "<li>Failed to load roster</li>";
+        }
+    }
+
+    async function loadPlayer(playerID, nameFirst, nameLast) {
+        playerPanel.hidden = false;
+        playerName.textContent = `${nameFirst} ${nameLast}`;
+        playerBio.innerHTML = "Loading...";
+        battingTable.querySelector("thead").innerHTML = "";
+        battingTable.querySelector("tbody").innerHTML = "";
+
+        try {
+            const response = await fetch(`/player/${playerID}`);
+            const data = await response.json();
+            const bio = data.bio;
+
+            const birthDate = [bio.birthMonth, bio.birthDay, bio.birthYear].filter(Boolean).join("/");
+            const deathDate = [bio.deathMonth, bio.deathDay, bio.deathYear].filter(Boolean).join("/");
+            const birthPlace = [bio.birthCity, bio.birthState, bio.birthCountry].filter(Boolean).join(", ");
+
+            let bioHTML = `<p><strong>Full Name:</strong> ${bio.nameGiven || ""} ${bio.nameLast || ""}</p>`;
+            if (birthDate) bioHTML += `<p><strong>Born:</strong> ${birthDate}${birthPlace ? " — " + birthPlace : ""}</p>`;
+            if (deathDate) bioHTML += `<p><strong>Died:</strong> ${deathDate}</p>`;
+            if (bio.height) bioHTML += `<p><strong>Height:</strong> ${Math.floor(bio.height / 12)}'${bio.height % 12}"</p>`;
+            if (bio.weight) bioHTML += `<p><strong>Weight:</strong> ${bio.weight} lbs</p>`;
+            if (bio.bats || bio.throws) bioHTML += `<p><strong>Bats/Throws:</strong> ${bio.bats || "?"}/${bio.throws || "?"}</p>`;
+            if (bio.debut) bioHTML += `<p><strong>Debut:</strong> ${bio.debut}</p>`;
+            if (bio.finalGame) bioHTML += `<p><strong>Final Game:</strong> ${bio.finalGame}</p>`;
+            playerBio.innerHTML = bioHTML;
+
+            const cols = ["yearID", "teamID", "G", "AB", "R", "H", "2B", "3B", "HR", "RBI", "SB", "BB", "SO", "AVG"];
+            const headerRow = cols.map(c => `<th>${c}</th>`).join("");
+            battingTable.querySelector("thead").innerHTML = `<tr>${headerRow}</tr>`;
+
+            const tbody = battingTable.querySelector("tbody");
+            data.batting.forEach(b => {
+                const avg = (b.AB && b.AB > 0) ? (b.H / b.AB).toFixed(3).replace(/^0/, "") : "---";
+                const row = [b.yearID, b.teamID, b.G, b.AB, b.R, b.H, b.double, b.triple, b.HR, b.RBI, b.SB, b.BB, b.SO, avg];
+                const tr = document.createElement("tr");
+                tr.innerHTML = row.map(v => `<td>${v ?? ""}</td>`).join("");
+                tbody.appendChild(tr);
+            });
+        } catch {
+            playerBio.innerHTML = "<p>Failed to load player data</p>";
         }
     }
 
@@ -46,10 +96,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!year) {
             teamsPanel.hidden = true;
             rosterPanel.hidden = true;
+            playerPanel.hidden = true;
             return;
         }
 
         rosterPanel.hidden = true;
+        playerPanel.hidden = true;
 
         teamsList.innerHTML = "<p>Loading...</p>";
         teamsPanel.hidden = false;
